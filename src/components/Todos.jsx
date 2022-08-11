@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
   const [todoDates, setTodoDates] = useState([]);
   // TEST
-  const userId = "-N938oxnuvP1_hAlLYBG";
+  //const userId = "-N938oxnuvP1_hAlLYBG";
+  const userId = useSelector((state) => state.currentUser.currentUser);
   // END TEST
 
   const getData = async () => {
@@ -19,11 +21,6 @@ const Todos = () => {
       setTodos((prev) => [...prev, todo]);
       setTodoDates((prev) => [...prev, date]);
     });
-  };
-
-  const logHandler = (e) => {
-    e.preventDefault();
-    console.log(todos, todoDates);
   };
 
   useEffect(() => {

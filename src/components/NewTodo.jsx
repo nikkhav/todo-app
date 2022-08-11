@@ -1,42 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const NewTodo = () => {
   // Set username and password to state
   const [todo, setTodo] = useState("");
-  const [userId, setUserId] = useState("");
+  const loggedIn = useSelector((state) => state.currentUser.isLoggedIn);
+  const userId = useSelector((state) => state.currentUser.currentUser);
 
   // Date and index
   let userIndex = 0;
   let todoIndex = `${userIndex}-${Date.now()}`;
 
-  // Find user id
-  const findUser = async () => {
-    const res = await axios.get(
-      "https://todo-ap-baadf-default-rtdb.europe-west1.firebasedatabase.app/users/.json"
-    );
-    const data = await res.data;
-    const users = Object.values(data);
-    const usersIds = Object.keys(data);
-
-    const findIndexUser = users.map((user, index) => {
-      if (user.username === "nikkhav") {
-        userIndex = index;
-        return user;
-      } else {
-        return null;
-      }
-    });
-    setUserId(usersIds[userIndex]);
-  };
-
-  findUser();
-
   // Add todo to database
   const todoHandler = (e) => {
-    if (e.target.value.length > 0) {
-      setTodo(e.target.value);
-    } else alert("Please enter a todo");
+    setTodo(e.target.value);
   };
 
   const sendTodo = (e) => {
@@ -54,16 +33,17 @@ const NewTodo = () => {
         .then((res) => {
           console.log(res);
         });
+    } else {
+      alert("Please enter a todo");
     }
     console.log(todo);
   };
-  return (
+  const todoForm = (
     <div
       className={
         "container flex flex-col mx-auto bg-white border-2 rounded-xl p-20 mt-40 shadow-lg"
       }
     >
-      <h2>Current user is {userId}</h2>
       <label className={"font-extrabold mx-auto mb-10 text-3xl"}>
         Create a new TODO
       </label>
@@ -87,6 +67,26 @@ const NewTodo = () => {
         </button>
       </form>
     </div>
+  );
+  return (
+    <Fragment>
+      {loggedIn ? (
+        todoForm
+      ) : (
+        <div
+          className={
+            "container flex flex-col mx-auto bg-white border-2 rounded-xl p-20 mt-40 shadow-lg"
+          }
+        >
+          <h1>Login first</h1>
+          <Link to={"/login"}>
+            <button className={"rounded-full bg-blue-700 py-3 px-4"}>
+              Login
+            </button>
+          </Link>
+        </div>
+      )}
+    </Fragment>
   );
 };
 

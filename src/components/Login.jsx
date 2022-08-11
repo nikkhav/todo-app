@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { currentUserActions } from "../store/currentUserSlice";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameIsValid, setUsernameIsValid] = useState(false);
   const [passwordIsValid, setPasswordIsValid] = useState(false);
+
+  const dispatch = useDispatch();
 
   // Set username and password to state
   const setUsernameHandler = (e) => {
@@ -27,25 +31,34 @@ const Login = () => {
 
   // Check if username and password are valid
   const validateForm = () => {
-    console.log(usernameIsValid, passwordIsValid);
     if (usernameIsValid && passwordIsValid) {
+      setUsername("");
+      setPassword("");
       console.log("Form is valid");
       axios
-        .post(
-          "https://todo-ap-baadf-default-rtdb.europe-west1.firebasedatabase.app/users/.json",
-          {
-            username: username,
-            password: password,
-          }
+        .get(
+          `https://todo-ap-baadf-default-rtdb.europe-west1.firebasedatabase.app/users/.json`
         )
         .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
+          const listOfUsers = Object.values(res.data);
+          const listOfUsersIds = Object.keys(res.data);
+          const user = listOfUsers.find((user) => user.username === username);
+          if (user) {
+            if (user.password === password) {
+              const indexOfUser = listOfUsers.indexOf(user);
+              const userId = listOfUsersIds[indexOfUser];
+              dispatch(currentUserActions.setCurrentUser(userId));
+              dispatch(currentUserActions.setUsername(user.username));
+              dispatch(currentUserActions.setIsLoggedIn());
+              console.log("User is valid");
+            } else {
+              console.log("Password or username is incorrect");
+            }
+          } else {
+            console.log("Form is invalid");
+          }
+          console.log(user);
         });
-    } else {
-      console.log("Form is invalid");
     }
   };
 

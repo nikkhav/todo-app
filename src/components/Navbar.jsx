@@ -1,7 +1,9 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
+  const currentUser = useSelector((state) => state.currentUser);
   return (
     <div
       className={"flex flex-row bg-white m-0 p-0"}
@@ -12,6 +14,15 @@ const Navbar = () => {
       >
         <nav className={"subpixel-antialiased tracking-wide font-mono"}>
           <NavLink to={"/"}>TODO from Nikita</NavLink>
+          {/*testing data*/}
+          <p className={"justify-center"}>
+            {" "}
+            {currentUser.isLoggedIn
+              ? `Welcome ${currentUser.username}`
+              : "Not logged in"}
+            {/*Current user is {currentUser.currentUser} / {currentUser.username}*/}
+          </p>
+          {/*end testing data*/}
         </nav>
       </div>
       <div className={"flex flex-row flex-none justify-end items-center pr-10"}>
